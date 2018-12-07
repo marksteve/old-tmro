@@ -1,0 +1,167 @@
+guild_vs3	mapflag	pvp
+guild_vs3	mapflag	nosave	SavePoint
+guild_vs3	mapflag	nobranch
+event_01	mapflag	nobranch
+
+event_01,158,201,3	script	Stef	814,{
+  mes "[Stef]";
+  mes "Hey! What's up?";
+  menu "I want to be strong...",job_change,"I want to die.",-;
+  next;
+  mes "[Stef]";
+  mes "Ok!";
+  specialeffect 510;
+  next;
+  specialeffect2 585;
+  atcommand("@die");
+  close;
+job_change:
+  setarray .JobLists[0],4008,4009,4010,4011,4012,4013,4015,4016,4017,4018,4019,( Sex )?"4020":"4021";
+  for( set .@i,0; .@i < getarraysize( .JobLists ); set .@i,.@i + 1 ) {
+    set .@Menu$,.@Menu$ + (( Class != .JobLists[.@i] )?jobname( .JobLists[.@i] ):"")+":";
+  }
+  set .@i,select( .@Menu$ ) - 1;
+  jobchange .JobLists[.@i];
+  resetstatus;
+  resetskill;
+  set BaseLevel,99;
+  set JobLevel,70;
+  set StatusPoint,1325;
+  set SkillPoint,118;
+  skill 1,9,0;
+  skill 142,1,0;
+  skill 143,1,0;
+  skill 145,1,0;
+  skill 146,1,0;
+  skill 147,1,0;
+  skill 148,1,0;
+  skill 149,1,0;
+  skill 150,1,0;
+  skill 151,1,0;
+  skill 152,1,0;
+  skill 153,1,0;
+  skill 154,1,0;
+  skill 155,1,0;
+  skill 156,1,0;
+  skill 157,1,0;
+  mes "You are now a "+jobname( Class )+"!";
+  close;
+}
+
+event_01,158,346,4	script	Arena	722,{
+  mes "[Arena]";
+  mes "Are you ready?";
+  menu "Yep!",handa,"Waits...",-;
+  close;
+handa:
+  savepoint("event_01",158,339);
+  warp "guild_vs3",0,0;
+  close;
+}
+
+event_01,150,353,6	script	Broken Vending Machine	564,{
+  mes "[Broken Vending Machine]";
+  while( 1 ) {
+    mes "Enter item code:";
+    input @item_name$;
+    mes "> "+@item_name$;
+    mes "Enter item quantity:";
+    input @item_qty$;
+    mes "> "+@item_qty$;
+    getitem @item_name$,@item_qty$;
+    menu "Enter another item",-,"Done",bye;
+  }
+bye:
+  close;
+}
+
+function	script	justin_close	{
+  cutin "",255;
+  close;
+}
+
+function	script	justin_refine	{
+  for( set .@i,1; .@i <= 10; set .@i,.@i + 1 )
+    set .@Menu$,.@Menu$ + (( getarg(0) & pow( 2,(.@i-1 ) ) && getequiprefinerycnt( .@i ) < getarg(1) && getequipisequiped( .@i) )?"^FF0000+"+getequiprefinerycnt( .@i )+" ^0000FF"+getequipname( .@i )+" "+( getitemslots( getequipid( .@i ) )?"["+getitemslots( getequipid( .@i ) )+"]":"" )+"^000000":"")+":";
+  select( .@Menu$ );
+  if( getarg(2) == 1 && !getequipisenableref( @menu ) )
+    mes "Sorry. I cannot.";
+  else{
+    if( getarg(3) )
+      while( getequiprefinerycnt( @menu ) < getarg(1) )
+        successrefitem ( @menu );
+    else
+      successrefitem ( @menu );
+  }
+  return;
+}
+
+event_01,165,353,3	script	Justin	865,{
+  cutin "3rd_gn_dbris01",2;
+  mes "[Justin]";
+  mes "Hello! What can I do for you?";
+  menu "Heal pls.",l_heal,"Repair",l_repair,"Refine",l_upgrade,"Rent",l_rent,"Reset",l_reset,"Nothing. I just wanted to see you.",-;
+  next;
+  mes "[Justin]";
+  mes "Aw...";
+  specialeffect 364;
+  callfunc "justin_close";
+l_heal:
+  percentheal 100,100;
+  sc_end SC_POISON;
+  sc_end SC_SILENCE;
+  sc_end SC_BLEEDING;
+  sc_end SC_BLIND;
+  sc_end SC_SLOWDOWN;
+  skilleffect 28,MaxHp;
+  skilleffect 9,MaxSp;
+  callfunc "justin_close";
+l_repair:
+  next;
+  if( getbrokenid(1) != 0 ){
+    while( getbrokenid(1) != 0 )
+      repair 1;
+    mes "[Justin]";
+    mes "Here you go! Be careful next time.";
+  } else {
+    mes "[Justin]";
+    mes "Hey... You just wanted to see me!";
+  }
+  callfunc "justin_close";
+l_upgrade:
+  next;
+  while( 1 ){
+    mes "[Justin]";
+    mes "Which item?";
+    setarray .EquipSlots$[0],"Top Headgear","Armor","Left Hand","Right Hand","Garment","Shoes","Left Accessory","Right Accessory","Middle Headgear","Lower Headgear";
+    for( set .@i,0; .@i < getarraysize( .EquipSlots$ ); set .@i,.@i + 1 ) {
+      set .@Menu$,.@Menu$ + .EquipSlots$[.@i] + ":";
+    }
+    set .@i,select( .@Menu$ ) - 1;
+    callfunc "justin_refine",pow( 2,.@i ),10,1,1;
+    mes "Klang! Klang! Taran!";
+    next;
+  }
+  callfunc "justin_close";
+l_rent:
+  next;
+  switch( BaseClass ) {
+    case Job_Merchant: setcart; break;
+    case Job_Archer: setfalcon; break;
+    case Job_Swordman: setmount; break;
+  }
+  callfunc "justin_close";
+l_reset:
+  next;
+  mes "[Justin]";
+  mes "What do you want to reset?";
+  switch( select( "Status:Skills:Both" ) ){
+    case 1: resetstatus; break;
+    case 2: resetskill; break;
+    case 3: resetstatus; resetskill; break;
+  }
+  next;
+  mes "[Justin]";
+  mes "Done! Good luck.";
+  callfunc "justin_close";
+}
