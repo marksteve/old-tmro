@@ -6,7 +6,7 @@ event_01	mapflag	nobranch
 event_01,158,201,3	script	Stef	814,{
   mes "[Stef]";
   mes "Hey! What's up?";
-  menu "I want to be strong...",job_change,"I want to die.",-;
+  menu "I want to be strong.",job_change,"I want money",get_zeny,"I want to leave this place.",-;
   next;
   mes "[Stef]";
   mes "Ok!";
@@ -45,6 +45,10 @@ job_change:
   skill 156,1,0;
   skill 157,1,0;
   mes "You are now a "+jobname( Class )+"!";
+  close;
+get_zeny:
+  set Zeny,10000000;
+  mes "Here's 10,000,000!";
   close;
 }
 
