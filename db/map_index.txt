@@ -1113,3 +1113,12 @@
 event_01 1
 guild_vs3
 prontera
+1@cata
+2@cata
+e_tower
+1@tower
+2@tower
+3@tower
+4@tower
+5@tower
+6@tower
